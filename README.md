@@ -19,18 +19,15 @@ In this repo, you’ll find the folders/files that have been modified from WordP
 > In 4.9.6, the ability for an administrator to initiate a data export or data erasure for a user by email address was added. While this provided sites with the tools to be compliant with new laws and regulations, site owners are still left to find a way to accommodate those requests. Adding a way for users to initiate this request on their own would prove a more “out of the box” experience and decrease the burden on site administrators to initiate these requests themselves.
 > Related tickets: #44013
 
-## Features
+## Features / to-do list
 
-- PHP Function to display the Privacy Data Request Form: `wp_get_privacy_data_request_form()`
-- New Core Widget: `WP_Widget_Data_Request`
-
-### Upcoming features and to-do list
-
-- Gutenberg Block
-- Add filters to handle strings customization in the form
-- Accessibility audit
-- Security audit
-- Coding standards audit
+- ✅ PHP Function to display the Privacy Data Request Form: `wp_get_privacy_data_request_form()`
+- ✅ New Core Widget: `WP_Widget_Data_Request`
+- 🔲 Gutenberg Block
+- ✅ Add filters to handle strings customization in the forms
+- 🔲 Accessibility audit
+- 🔲 Security audit
+- 🔲 Coding standards audit
 
 ## Contributors
 
