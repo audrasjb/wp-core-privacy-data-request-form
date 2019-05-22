@@ -6,9 +6,9 @@ Development of a new WordPress Core Privacy Data Request Form.
 
 The purpose of this repository is to prepare a future Privacy Data Request Form feature.
 
-The feature is based on an existing plugin: [GDPR Data Request Form](https://wordpress.org/plugins/gdpr-data-request-form/), initially created by @audrasjb and @whodunit_agency.
+The feature is based on an existing plugin: [GDPR Data Request Form](https://wordpress.org/plugins/gdpr-data-request-form/), initially created by [@audrasjb](https://profiles.wordpress.org/audrasjb) and [@whodunitagency](https://profiles.wordpress.org/whodunitagency/).
 
-In this repo, you’ll find the folders/files that have been modified in WordPress Core (current trunk).
+In this repo, you’ll find the folders/files that have been modified from WordPress Core (current trunk).
 
 ## Context
 
@@ -31,3 +31,9 @@ In this repo, you’ll find the folders/files that have been modified in WordPre
 - Accessibility audit
 - Security audit
 - Coding standards audit
+
+## Contributors
+
+- audrasjb
+- whodunitagency
+- xkon
