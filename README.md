@@ -41,7 +41,9 @@ In this repo, you’ll find the folders/files that have been modified from WordP
 ## Screenshots
 
 Admin Widget in the Widget Screen:
+
 ![Admin Widget in the Widget Screen](https://jeanbaptisteaudras.com/images/privacy-widget-admin.png)
 
 Public Widget Rendering in Twenty Nineteen (default styles):
+
 ![Public Widget Rendering in Twenty Nineteen (default styles)](https://jeanbaptisteaudras.com/images/privacy-widget-public.png)
