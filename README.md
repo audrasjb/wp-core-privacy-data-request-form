@@ -4,7 +4,7 @@ Development of a new WordPress Core feature – Privacy Data Request Forms.
 
 Table of content:
 
-- [About](https://github.com/audrasjb/wp-core-privacy-data-request-form#description)
+- About
 - [Context](https://github.com/audrasjb/wp-core-privacy-data-request-form#context)
 - [Features / to-do list](https://github.com/audrasjb/wp-core-privacy-data-request-form#features--to-do-list)
 - [Contributors](https://github.com/audrasjb/wp-core-privacy-data-request-form#contributors)
