@@ -314,54 +314,59 @@ function get_search_form( $args = array() ) {
  */
 function wp_get_privacy_data_request_form() {
  	
-	$wp_privacy_form_errors    = array();
-	$pricacy_form_notice       = '';
-	$wp_privacy_form_type      = sanitize_key( $_POST['wp_privacy_form_type'] );
-	$wp_privacy_form_email     = sanitize_email( $_POST['wp_privacy_form_email'] );
-	$wp_privacy_form_human     = absint( filter_input( INPUT_POST, 'wp_privacy_form_human', FILTER_SANITIZE_NUMBER_INT ) );
-	$wp_privacy_form_human_key = esc_html( filter_input( INPUT_POST, 'wp_privacy_form_human_key', FILTER_SANITIZE_STRING ) );
-	$wp_privacy_form_numbers   = explode( '000', $wp_privacy_form_human_key );
-	$wp_privacy_form_answer    = absint( $wp_privacy_form_numbers[0] ) + absint( $wp_privacy_form_numbers[1] );
-	$wp_privacy_form_nonce     = esc_html( filter_input( INPUT_POST, 'wp_privacy_form_nonce', FILTER_SANITIZE_STRING ) );
-
-	if ( ! empty( $wp_privacy_form_email ) && ! empty( $wp_privacy_form_human ) ) {
-		if ( ! wp_verify_nonce( $wp_privacy_form_nonce, 'wp_privacy_form_nonce' ) ) {
-			$wp_privacy_form_errors[] = esc_html__( 'Security check failed, please refresh this page and try to submit the form again.' );
+	if ( isset( $_POST['wp_privacy_form_email'] ) ) {
+		$wp_privacy_form_errors    = array();
+		$pricacy_form_notice       = '';
+		$wp_privacy_form_type      = sanitize_key( $_POST['wp_privacy_form_type'] );
+		$wp_privacy_form_email     = sanitize_email( $_POST['wp_privacy_form_email'] );
+		$wp_privacy_form_human     = absint( filter_input( INPUT_POST, 'wp_privacy_form_human', FILTER_SANITIZE_NUMBER_INT ) );
+		$wp_privacy_form_human_key = esc_html( filter_input( INPUT_POST, 'wp_privacy_form_human_key', FILTER_SANITIZE_STRING ) );
+		$wp_privacy_form_numbers   = explode( '000', $wp_privacy_form_human_key );
+		$wp_privacy_form_answer    = absint( $wp_privacy_form_numbers[0] ) + absint( $wp_privacy_form_numbers[1] );
+		$wp_privacy_form_nonce     = esc_html( filter_input( INPUT_POST, 'wp_privacy_form_nonce', FILTER_SANITIZE_STRING ) );
+	
+		if ( ! empty( $wp_privacy_form_email ) && ! empty( $wp_privacy_form_human ) ) {
+			if ( ! wp_verify_nonce( $wp_privacy_form_nonce, 'wp_privacy_form_nonce' ) ) {
+				$wp_privacy_form_errors[] = esc_html__( 'Security check failed, please refresh this page and try to submit the form again.' );
+			} else {
+				if ( ! is_email( $wp_privacy_form_email ) ) {
+					$wp_privacy_form_errors[] = esc_html__( 'This is not a valid email address.' );
+				}
+				if ( intval( $wp_privacy_form_answer ) !== intval( $wp_privacy_form_human ) ) {
+					$wp_privacy_form_errors[] = esc_html__( 'Security check failed, invalid human verification field.' );
+				}
+				if ( ! in_array( $wp_privacy_form_type, array( 'export_personal_data', 'remove_personal_data' ), true ) ) {
+					$wp_privacy_form_errors[] = esc_html__( 'Request type invalid, please refresh this page and try to submit the form again.' );
+				}
+			}
 		} else {
-			if ( ! is_email( $wp_privacy_form_email ) ) {
-				$wp_privacy_form_errors[] = esc_html__( 'This is not a valid email address.' );
-			}
-			if ( intval( $wp_privacy_form_answer ) !== intval( $wp_privacy_form_human ) ) {
-				$wp_privacy_form_errors[] = esc_html__( 'Security check failed, invalid human verification field.' );
-			}
-			if ( ! in_array( $wp_privacy_form_type, array( 'export_personal_data', 'remove_personal_data' ), true ) ) {
-				$wp_privacy_form_errors[] = esc_html__( 'Request type invalid, please refresh this page and try to submit the form again.' );
-			}
+			$wp_privacy_form_errors[] = esc_html__( 'All fields are required.' );
 		}
-	} else {
-		$wp_privacy_form_errors[] = esc_html__( 'All fields are required.' );
-	}
-	if ( empty( $wp_privacy_form_errors ) ) {
-		$request_id = wp_create_user_request( $wp_privacy_form_email, $wp_privacy_form_type );
-		if ( is_wp_error( $request_id ) ) {
-			$wp_privacy_form_errors[] = $request_id->get_error_message();
-		} elseif ( ! $request_id ) {
-			$wp_privacy_form_errors[] = esc_html__( 'Unable to initiate confirmation request. Please contact the administrator.' );
+		if ( empty( $wp_privacy_form_errors ) ) {
+			$request_id = wp_create_user_request( $wp_privacy_form_email, $wp_privacy_form_type );
+			if ( is_wp_error( $request_id ) ) {
+				$wp_privacy_form_errors[] = $request_id->get_error_message();
+			} elseif ( ! $request_id ) {
+				$wp_privacy_form_errors[] = esc_html__( 'Unable to initiate confirmation request. Please contact the administrator.' );
+			} else {
+				$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . esc_html__( 'Your enquiry have been submitted. Check your email to validate your data request.' ) . '</div>';
+			}
 		} else {
-			$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . esc_html__( 'Your enquiry have been submitted. Check your email to validate your data request.' ) . '</div>';
+			$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . esc_html__( 'Some errors occurred:' ) . '<br />' . join( '<br />', $wp_privacy_form_errors ) . '</div>';
 		}
-	} else {
-		$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . join( '<br />', $wp_privacy_form_errors ) . '</div>';
 	}
 
 	// Math captcha
 	$number_one = rand( 1, 9 );
 	$number_two = rand( 1, 9 );
+	
+	// Key to avoid duplicate IDs
+	$key_id = uniqid();
 
 	// Return the form
 	ob_start();
 	?>
-	<form action="#wp-privacy-form" method="post" id="wp-privacy-form">
+	<form action="#wp-privacy-form-<?php echo $key_id; ?>" id="wp-privacy-form-<?php echo $key_id; ?>" method="post">
 		<input type="hidden" name="action" value="wp_privacy_form-data_request">
 		<input type="hidden" name="wp_privacy_form_human_key" value="<?php echo $number_one . '000' . $number_two; ?>" />
 		<input type="hidden" name="wp_privacy_form_nonce" value="<?php echo wp_create_nonce( 'wp_privacy_form_nonce' ); ?>" />
@@ -369,39 +374,39 @@ function wp_get_privacy_data_request_form() {
 		<?php if ( ! empty( $pricacy_form_notice ) ) { echo $pricacy_form_notice; } ?>
 		
 		<div class="wp-privacy-form-field wp-privacy-form-field-action" role="radiogroup" aria-labelledby="wp-privacy-form-radio-label">
-			<p id="wp-privacy-form-radio-label">
+			<p id="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
 				<?php esc_html_e( 'Select your request:' ); ?>
 			</p>
-			<input id="wp-privacy-form-data-type-export" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="export_personal_data">
-			<label for="wp-privacy-form-data-type-export" class="wp-privacy-form-data-type-label">
+			<input id="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="export_personal_data">
+			<label for="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
 				<?php esc_html_e( 'Export Personal Data' ); ?>
 			</label>
 			<br />
-			<input id="wp-privacy-form-data-type-remove" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="remove_personal_data">
-			<label for="wp-privacy-form-data-type-remove" class="wp-privacy-form-data-type-label">
+			<input id="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="remove_personal_data">
+			<label for="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
 				<?php esc_html_e( 'Remove Personal Data' ); ?>
 			</label>
 		</div>
 
 		<p class="wp-privacy-form-field wp-privacy-form-field-email">
-			<label for="wp_privacy_form-data_email">
+			<label for="wp_privacy_form-data_email-<?php echo $key_id; ?>">
 				<?php esc_html_e( 'Your email address (required)' ); ?>
 			</label>
 			<br />
-			<input type="email" id="wp_privacy_form-data_email" name="wp_privacy_form_email" required />
+			<input type="email" id="wp_privacy_form-data_email-<?php echo $key_id; ?>" name="wp_privacy_form_email" required />
 		</p>
 
 		<p class="wp-privacy-form-field wp-privacy-form-field-human">
-			<label for="wp_privacy_form-data_human">
+			<label for="wp_privacy_form-data_human-<?php echo $key_id; ?>">
 				<?php esc_html_e( 'Human verification (required):' ); ?>
 				<?php echo $number_one . ' + ' . $number_two . ' = ?'; ?>
 			</label>
 			<br />
-			<input type="text" id="wp_privacy_form-data_human" name="wp_privacy_form_human" required />
+			<input type="text" id="wp_privacy_form-data_human-<?php echo $key_id; ?>" name="wp_privacy_form_human" required />
 		</p>
 
 		<p class="wp-privacy-form-field wp-privacy-form-field-submit">
-			<input id="wp-privacy-form-submit-button" type="submit" value="<?php esc_html_e( 'Send request' ); ?>" />
+			<input type="submit" value="<?php esc_html_e( 'Send request' ); ?>" />
 		</p>
 	</form>
 	<?php
