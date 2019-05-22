@@ -311,9 +311,48 @@ function get_search_form( $args = array() ) {
  * Display Privacy Data Request Form.
  *
  * @since 5.3.0
+ *
+ * @param array $args {
+ *     Optional. Array of options to control the form output. Default empty array.
+ *
+ *     @type string $form_id              ID attribute value for the form. Default 'loginform'.
+ *     @type string $label_select_request Label for request selection field. Default 'Select your request:'.
+ *     @type string $label_select_export  Label for export radiobutton field. Default 'Export Personal Data'.
+ *     @type string $label_select_remove  Label for remove radiobutton field. Default 'Remove Personal Data'.
+ *     @type string $label_input_email    Label for email input field. Default 'Your email address (required)'.
+ *     @type string $label_input_captcha  Label for math captcha input field. Default 'Human verification (required):'.
+ *     @type string $value_submit         Text for submit button. Default 'Send Request'.
+ * }
+ * @return string String when retrieving.
  */
-function wp_get_privacy_data_request_form() {
- 	
+function wp_get_privacy_data_request_form( $args = array() ) {
+
+	// Key to avoid duplicate IDs
+	$key_id = uniqid();
+
+	$defaults = array(
+		'form_id'              => 'wp-privacy-form-' . $key_id,
+		'label_select_request' => esc_html__( 'Select your request:' ),
+		'label_select_export'  => esc_html__( 'Export Personal Data' ),
+		'label_select_remove'  => esc_html__( 'Remove Personal Data' ),
+		'label_input_email'    => esc_html__( 'Your email address (required)' ),
+		'label_input_captcha'  => esc_html__( 'Human verification (required):' ),
+		'value_submit'         => esc_html__( 'Send Request' ),
+	);
+
+	/**
+	 * Filters the default Privacy Data Request Form output arguments.
+	 *
+	 * @since 5.3.0
+	 *
+	 * @see wp_get_privacy_data_request_form()
+	 *
+	 * @param array $defaults An array of default Privacy Data Request Form arguments.
+	 */
+
+	$args = wp_parse_args( $args, apply_filters( 'privacy_data_request_form_defaults', $defaults ) );
+
+	// Actions if the form was previously submitted
 	if ( isset( $_POST['wp_privacy_form_email'] ) ) {
 		$wp_privacy_form_errors    = array();
 		$pricacy_form_notice       = '';
@@ -360,13 +399,10 @@ function wp_get_privacy_data_request_form() {
 	$number_one = rand( 1, 9 );
 	$number_two = rand( 1, 9 );
 	
-	// Key to avoid duplicate IDs
-	$key_id = uniqid();
-
 	// Return the form
 	ob_start();
 	?>
-	<form action="<?php esc_url( '#wp-privacy-form-'. $key_id ); ?>" id="wp-privacy-form-<?php echo $key_id; ?>" method="post">
+	<form action="<?php esc_url( '#wp-privacy-form-'. $key_id ); ?>" id="<?php echo $args['form_id']; ?>" method="post">
 		<input type="hidden" name="action" value="wp_privacy_form-data_request">
 		<input type="hidden" name="wp_privacy_form_human_key" value="<?php echo $number_one . '000' . $number_two; ?>" />
 		<input type="hidden" name="wp_privacy_form_nonce" value="<?php echo wp_create_nonce( 'wp_privacy_form_nonce' ); ?>" />
@@ -375,22 +411,22 @@ function wp_get_privacy_data_request_form() {
 		
 		<div class="wp-privacy-form-field wp-privacy-form-field-action" role="radiogroup" aria-labelledby="wp-privacy-form-radio-label">
 			<p id="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
-				<?php esc_html_e( 'Select your request:' ); ?>
+				<?php echo $args['label_select_request']; ?>
 			</p>
 			<input id="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="export_personal_data">
 			<label for="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
-				<?php esc_html_e( 'Export Personal Data' ); ?>
+				<?php echo $args['label_select_export']; ?>
 			</label>
 			<br />
 			<input id="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="remove_personal_data">
 			<label for="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
-				<?php esc_html_e( 'Remove Personal Data' ); ?>
+				<?php echo $args['label_select_remove']; ?>
 			</label>
 		</div>
 
 		<p class="wp-privacy-form-field wp-privacy-form-field-email">
 			<label for="wp_privacy_form-data_email-<?php echo $key_id; ?>">
-				<?php esc_html_e( 'Your email address (required)' ); ?>
+				<?php echo $args['label_input_email']; ?>
 			</label>
 			<br />
 			<input type="email" id="wp_privacy_form-data_email-<?php echo $key_id; ?>" name="wp_privacy_form_email" required />
@@ -398,7 +434,7 @@ function wp_get_privacy_data_request_form() {
 
 		<p class="wp-privacy-form-field wp-privacy-form-field-human">
 			<label for="wp_privacy_form-data_human-<?php echo $key_id; ?>">
-				<?php esc_html_e( 'Human verification (required):' ); ?>
+				<?php echo $args['label_input_captcha']; ?>
 				<?php echo $number_one . ' + ' . $number_two . ' = ?'; ?>
 			</label>
 			<br />
@@ -406,7 +442,7 @@ function wp_get_privacy_data_request_form() {
 		</p>
 
 		<p class="wp-privacy-form-field wp-privacy-form-field-submit">
-			<input type="submit" value="<?php esc_html_e( 'Send request' ); ?>" />
+			<input type="submit" value="<?php echo $args['value_submit']; ?>" />
 		</p>
 	</form>
 	<?php
