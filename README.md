@@ -1,6 +1,6 @@
 # WordPress Core Pricacy Data Request Form
 
-Development of a new WordPress Core Privacy Data Request Form.
+Development of a new WordPress Core feature – Privacy Data Request Forms.
 
 ## Description
 
