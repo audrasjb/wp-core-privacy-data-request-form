@@ -44,3 +44,45 @@ In this repo, you’ll find the folders/files that have been modified from WordP
 ### Public Widget Rendering in Twenty Nineteen (default styles)
 
 ![Public Widget Rendering in Twenty Nineteen (default styles)](https://jeanbaptisteaudras.com/images/privacy-widget-public.png)
+
+## Documentation
+
+### Filter: `privacy_data_request_form_defaults`
+
+#### Description
+
+`privacy_data_request_form_defaults` filters the default form output arguments. It is part of the function `wp_get_privacy_data_request_form()`.
+
+#### Parameters
+
+`$defaults` (array) (required) An array of default login form arguments. Default: None.
+
+The defaults set in the `wp_get_privacy_data_request_form()` function are as follows:
+
+	$defaults = array(
+		'form_id'              => 'wp-privacy-form-' . $key_id,
+		'label_select_request' => esc_html__( 'Select your request:' ),
+		'label_select_export'  => esc_html__( 'Export Personal Data' ),
+		'label_select_remove'  => esc_html__( 'Remove Personal Data' ),
+		'label_input_email'    => esc_html__( 'Your email address (required)' ),
+		'label_input_captcha'  => esc_html__( 'Human verification (required):' ),
+		'value_submit'         => esc_html__( 'Send Request' ),
+	);
+
+#### Example
+
+```
+add_filter( 'privacy_data_request_form_defaults', 'my_privacy_form' );
+function my_privacy_form() {
+	$args = array(
+		'form_id'              => 'my_super_form_id',
+		'label_select_request' => 'Please select a request',
+		'label_select_export'  => 'Export',
+		'label_select_remove'  => 'Delete', 
+		'label_input_email'    => 'Your email',
+		'label_input_captcha'  => 'Please prove you’re a human:',
+		'value_submit'         => 'Send your request',
+	);
+	return $args;
+}
+```
