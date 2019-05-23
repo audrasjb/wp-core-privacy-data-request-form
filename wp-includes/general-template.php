@@ -433,7 +433,7 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 	// Return the form
 	ob_start();
 	?>
-	<form action="<?php esc_url( '#wp-privacy-form-'. $key_id ); ?>" id="<?php echo $args['form_id']; ?>" method="post">
+	<form action="<?php esc_url( '#' . $args['form_id'] ); ?>" id="<?php echo $args['form_id']; ?>" class="wp-privacy-form" method="post">
 		<input type="hidden" name="action" value="wp_privacy_form-data_request">
 		<input type="hidden" name="wp_privacy_form_human_key" value="<?php echo $number_one . '000' . $number_two; ?>" />
 		<input type="hidden" name="wp_privacy_form_nonce" value="<?php echo wp_create_nonce( 'wp_privacy_form_nonce' ); ?>" />
