@@ -44,16 +44,6 @@ In this repo, you’ll find the folders/files that have been modified from WordP
 - whodunitagency
 - xkon
 
-## Screenshots
-
-### Admin Widget in the Widgets Screen
-
-![Admin Widget in the Widget Screen](https://jeanbaptisteaudras.com/images/privacy-widget-admin.png)
-
-### Public Widget Rendering in Twenty Nineteen (default styles)
-
-![Public Widget Rendering in Twenty Nineteen (default styles)](https://jeanbaptisteaudras.com/images/privacy-widget-public.png)
-
 ## Documentation
 
 ### Filter: `privacy_data_request_form_defaults`
@@ -97,3 +87,13 @@ function my_privacy_form() {
 	return $args;
 }
 ```
+
+## Screenshots
+
+### Admin Widget in the Widgets Screen
+
+![Admin Widget in the Widget Screen](https://jeanbaptisteaudras.com/images/privacy-widget-admin.png)
+
+### Public Widget Rendering in Twenty Nineteen (default styles)
+
+![Public Widget Rendering in Twenty Nineteen (default styles)](https://jeanbaptisteaudras.com/images/privacy-widget-public.png)
