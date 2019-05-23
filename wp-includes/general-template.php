@@ -445,7 +445,7 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 		<?php elseif ( 'remove' === $args['request_type'] ) : ?>
 			<input type="hidden" name="wp_privacy_form_type" value="remove_personal_data">
 		<?php else : ?>
-			<div class="wp-privacy-form-field wp-privacy-form-field-action" role="radiogroup" aria-labelledby="wp-privacy-form-radio-label">
+			<div class="wp-privacy-form-field wp-privacy-form-field-action" role="radiogroup" aria-labelledby="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
 				<p id="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
 					<?php echo $args['label_select_request']; ?>
 				</p>
