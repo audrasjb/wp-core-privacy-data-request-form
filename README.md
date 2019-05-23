@@ -35,7 +35,8 @@ To test/contribute, just copy these files in your WordPress install.
 - ✅ PHP Function to display the Privacy Data Request Form: `wp_get_privacy_data_request_form()`
 - ✅ New Core Widget: `WP_Widget_Data_Request`
 - ✅ Add filters to handle strings customization in the forms
-- 🔲 Add string customization to Core Widget
+- ✅ Add possibility to choose either show remove request, export request, or both in PHP Function
+- 🔲 Add possibility to choose either show remove request, export request, or both in Core Widget
 - 🔲 Gutenberg Block
 - 🔲 Accessibility audit
 - 🔲 Security audit
