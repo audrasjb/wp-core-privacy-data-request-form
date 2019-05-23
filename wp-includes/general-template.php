@@ -315,19 +315,35 @@ function get_search_form( $args = array() ) {
  * @param array $args {
  *     Optional. Array of options to control the form output. Default empty array.
  *
- *     @type string $form_id              ID attribute value for the form. Default 'loginform'.
- *     @type string $label_select_request Label for request selection field. Default 'Select your request:'.
- *     @type string $label_select_export  Label for export radiobutton field. Default 'Export Personal Data'.
- *     @type string $label_select_remove  Label for remove radiobutton field. Default 'Remove Personal Data'.
- *     @type string $label_input_email    Label for email input field. Default 'Your email address (required)'.
- *     @type string $label_input_captcha  Label for math captcha input field. Default 'Human verification (required):'.
- *     @type string $value_submit         Text for submit button. Default 'Send Request'.
- *     @type string $request_type         Select Request type.
- *                                        Accepted values:
- *                                        'both' (both export and remove Request)
- *                                        'export' (export Request only)
- *                                        'remove' (remove Request only)
- *                                        Default 'both'.
+ *     @type string $form_id                ID attribute value for the form. Default 'loginform'.
+ *     @type string $label_select_request   Label for request selection field. Default 'Select your request:'.
+ *     @type string $label_select_export    Label for export radiobutton field. Default 'Export Personal Data'.
+ *     @type string $label_select_remove    Label for remove radiobutton field. Default 'Remove Personal Data'.
+ *     @type string $label_input_email      Label for email input field. Default 'Your email address (required)'.
+ *     @type string $label_input_captcha    Label for math captcha input field. Default 'Human verification (required):'.
+ *     @type string $value_submit           Text for submit button. Default 'Send Request'.
+ *     @type string $request_type           Select Request type.
+ *                                          Accepted values:
+ *                                          'both' (both export and remove Request)
+ *                                          'export' (export Request only)
+ *                                          'remove' (remove Request only)
+ *                                          Default 'both'.
+ *     @type string $notice_success         Text for success notice. 
+ *                                          Default 'Your enquiry have been submitted. Check your email to validate your data request.'.
+ *     @type string $notice_error           Text for error notice.
+ *                                          Default 'Some errors occurred:'.
+ *     @type string $notice_invalid_nonce   Text for invalid nonce.
+ *                                          Default 'Security check failed, please refresh this page and try to submit the form again.'.
+ *     @type string $notice_invalid_email   Text for invalid email.
+ *                                          Default 'Invalid email address.'.
+ *     @type string $notice_invalid_captcha Text for invalid captcha.
+ *                                          Default 'Security check failed: invalid human verification field.'.
+ *     @type string $notice_invalid_request Text for invalid request.
+ *                                          Default 'Request type invalid, please refresh this page and try to submit the form again.'.
+ *     @type string $notice_missing_field   Text for missing field.
+ *                                          Default 'All fields are required.'.
+ *     @type string $notice_request_failed  Text for failed request.
+ *                                          Default 'Unable to initiate confirmation request. Please contact the administrator.'.
  * }
  * @return string String when retrieving.
  */
@@ -337,14 +353,22 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 	$key_id = uniqid();
 
 	$defaults = array(
-		'form_id'              => 'wp-privacy-form-' . $key_id,
-		'label_select_request' => esc_html__( 'Select your request:' ),
-		'label_select_export'  => esc_html__( 'Export Personal Data' ),
-		'label_select_remove'  => esc_html__( 'Remove Personal Data' ),
-		'label_input_email'    => esc_html__( 'Your email address (required)' ),
-		'label_input_captcha'  => esc_html__( 'Human verification (required):' ),
-		'value_submit'         => esc_html__( 'Send Request' ),
-		'request_type'         => 'both',
+		'form_id'                => 'wp-privacy-form-' . $key_id,
+		'label_select_request'   => esc_html__( 'Select your request:' ),
+		'label_select_export'    => esc_html__( 'Export Personal Data' ),
+		'label_select_remove'    => esc_html__( 'Remove Personal Data' ),
+		'label_input_email'      => esc_html__( 'Your email address (required)' ),
+		'label_input_captcha'    => esc_html__( 'Human verification (required):' ),
+		'value_submit'           => esc_html__( 'Send Request' ),
+		'request_type'           => 'both',
+		'notice_success'         => esc_html__( 'Your enquiry have been submitted. Check your email to validate your data request.' ),
+		'notice_error'           => esc_html__( 'Some errors occurred:' ),
+		'notice_invalid_nonce'   => esc_html__( 'Security check failed, please refresh this page and try to submit the form again.' ),
+		'notice_invalid_email'   => esc_html__( 'Invalid email address.' ),
+		'notice_invalid_captcha' => esc_html__( 'Security check failed: invalid human verification field.' ),
+		'notice_invalid_request' => esc_html__( 'Request type invalid, please refresh this page and try to submit the form again.' ),
+		'notice_missing_field'   => esc_html__( 'All fields are required.' ),
+		'notice_request_failed'  => esc_html__( 'Unable to initiate confirmation request. Please contact the administrator.' ),
 	);
 
 	/**
@@ -373,32 +397,32 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 	
 		if ( ! empty( $wp_privacy_form_email ) && ! empty( $wp_privacy_form_human ) ) {
 			if ( ! wp_verify_nonce( $wp_privacy_form_nonce, 'wp_privacy_form_nonce' ) ) {
-				$wp_privacy_form_errors[] = esc_html__( 'Security check failed, please refresh this page and try to submit the form again.' );
+				$wp_privacy_form_errors[] = $args['notice_invalid_nonce'];
 			} else {
 				if ( ! is_email( $wp_privacy_form_email ) ) {
-					$wp_privacy_form_errors[] = esc_html__( 'This is not a valid email address.' );
+					$wp_privacy_form_errors[] = $args['notice_invalid_email'];
 				}
 				if ( intval( $wp_privacy_form_answer ) !== intval( $wp_privacy_form_human ) ) {
-					$wp_privacy_form_errors[] = esc_html__( 'Security check failed, invalid human verification field.' );
+					$wp_privacy_form_errors[] = $args['notice_invalid_captcha'];
 				}
 				if ( ! in_array( $wp_privacy_form_type, array( 'export_personal_data', 'remove_personal_data' ), true ) ) {
-					$wp_privacy_form_errors[] = esc_html__( 'Request type invalid, please refresh this page and try to submit the form again.' );
+					$wp_privacy_form_errors[] = $args['notice_invalid_request'];
 				}
 			}
 		} else {
-			$wp_privacy_form_errors[] = esc_html__( 'All fields are required.' );
+			$wp_privacy_form_errors[] = $args['notice_missing_field'];
 		}
 		if ( empty( $wp_privacy_form_errors ) ) {
 			$request_id = wp_create_user_request( $wp_privacy_form_email, $wp_privacy_form_type );
 			if ( is_wp_error( $request_id ) ) {
 				$wp_privacy_form_errors[] = $request_id->get_error_message();
 			} elseif ( ! $request_id ) {
-				$wp_privacy_form_errors[] = esc_html__( 'Unable to initiate confirmation request. Please contact the administrator.' );
+				$wp_privacy_form_errors[] = $args['notice_request_failed'];
 			} else {
-				$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . esc_html__( 'Your enquiry have been submitted. Check your email to validate your data request.' ) . '</div>';
+				$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . $args['notice_success'] . '</div>';
 			}
 		} else {
-			$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . esc_html__( 'Some errors occurred:' ) . '<br />' . join( '<br />', $wp_privacy_form_errors ) . '</div>';
+			$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . $args['notice_error'] . '<br />' . join( '<br />', $wp_privacy_form_errors ) . '</div>';
 		}
 	}
 
