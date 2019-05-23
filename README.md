@@ -53,6 +53,12 @@ To test/contribute, just copy these files in your WordPress install.
 
 ## Documentation
 
+### Function: `wp_get_privacy_data_request_form()`
+
+`$args` (array) An array of default Privacy Data Request Form arguments. Default: None.
+
+Default parameters: see Filter/Parameters section below.
+
 ### Filter: `privacy_data_request_form_defaults`
 
 #### Description
@@ -61,7 +67,7 @@ To test/contribute, just copy these files in your WordPress install.
 
 #### Parameters
 
-`$defaults` (array) (required) An array of default login form arguments. Default: None.
+`$defaults` (array) (required) An array of default Privacy Data Request Form arguments. Default: None.
 
 The defaults set in the `wp_get_privacy_data_request_form()` function are as follows:
 
