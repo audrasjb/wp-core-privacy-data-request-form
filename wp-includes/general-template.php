@@ -322,6 +322,12 @@ function get_search_form( $args = array() ) {
  *     @type string $label_input_email    Label for email input field. Default 'Your email address (required)'.
  *     @type string $label_input_captcha  Label for math captcha input field. Default 'Human verification (required):'.
  *     @type string $value_submit         Text for submit button. Default 'Send Request'.
+ *     @type string $request_type         Select Request type.
+ *                                        Accepted values:
+ *                                        'both' (both export and remove Request)
+ *                                        'export' (export Request only)
+ *                                        'remove' (remove Request only)
+ *                                        Default 'both'.
  * }
  * @return string String when retrieving.
  */
@@ -338,6 +344,7 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 		'label_input_email'    => esc_html__( 'Your email address (required)' ),
 		'label_input_captcha'  => esc_html__( 'Human verification (required):' ),
 		'value_submit'         => esc_html__( 'Send Request' ),
+		'request_type'         => 'both',
 	);
 
 	/**
@@ -350,7 +357,7 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 	 * @param array $defaults An array of default Privacy Data Request Form arguments.
 	 */
 
-	$args = wp_parse_args( $args, apply_filters( 'privacy_data_request_form_defaults', $defaults ) );
+	$args = wp_parse_args( $args, array_merge( $defaults, apply_filters( 'privacy_data_request_form_defaults', $defaults ) ) );
 
 	// Actions if the form was previously submitted
 	if ( isset( $_POST['wp_privacy_form_email'] ) ) {
@@ -398,7 +405,7 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 	// Math captcha
 	$number_one = rand( 1, 9 );
 	$number_two = rand( 1, 9 );
-	
+
 	// Return the form
 	ob_start();
 	?>
@@ -409,20 +416,26 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 		
 		<?php if ( ! empty( $pricacy_form_notice ) ) { echo $pricacy_form_notice; } ?>
 		
-		<div class="wp-privacy-form-field wp-privacy-form-field-action" role="radiogroup" aria-labelledby="wp-privacy-form-radio-label">
-			<p id="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
-				<?php echo $args['label_select_request']; ?>
-			</p>
-			<input id="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="export_personal_data">
-			<label for="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
-				<?php echo $args['label_select_export']; ?>
-			</label>
-			<br />
-			<input id="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="remove_personal_data">
-			<label for="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
-				<?php echo $args['label_select_remove']; ?>
-			</label>
-		</div>
+		<?php if ( 'export' === $args['request_type'] ) : ?>
+			<input type="hidden" name="wp_privacy_form_type" value="export_personal_data">
+		<?php elseif ( 'remove' === $args['request_type'] ) : ?>
+			<input type="hidden" name="wp_privacy_form_type" value="remove_personal_data">
+		<?php else : ?>
+			<div class="wp-privacy-form-field wp-privacy-form-field-action" role="radiogroup" aria-labelledby="wp-privacy-form-radio-label">
+				<p id="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
+					<?php echo $args['label_select_request']; ?>
+				</p>
+				<input id="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="export_personal_data">
+				<label for="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
+					<?php echo $args['label_select_export']; ?>
+				</label>
+				<br />
+				<input id="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="remove_personal_data">
+				<label for="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
+					<?php echo $args['label_select_remove']; ?>
+				</label>
+			</div>
+		<?php endif; ?>
 
 		<p class="wp-privacy-form-field wp-privacy-form-field-email">
 			<label for="wp_privacy_form-data_email-<?php echo $key_id; ?>">
