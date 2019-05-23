@@ -38,7 +38,7 @@ To test/contribute, just copy these files in your WordPress install.
 - ✅ Add possibility to choose either to show remove request, export request, or both in PHP Function
 - ✅ Add possibility to choose either to show remove request, export request, or both in Core Widget
 - ✅ Filter Documentation
-- 🔲 CSS classes documentation
+- ✅ CSS classes documentation
 - 🔲 Gutenberg Core Block
 - 🔲 Accessibility audit
 - 🔲 Security audit
