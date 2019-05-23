@@ -37,10 +37,13 @@ To test/contribute, just copy these files in your WordPress install.
 - ✅ Add filters to handle strings customization in the forms
 - ✅ Add possibility to choose either to show remove request, export request, or both in PHP Function
 - ✅ Add possibility to choose either to show remove request, export request, or both in Core Widget
-- 🔲 Gutenberg Block
+- ✅ Filter Documentation
+- 🔲 CSS classes documentation
+- 🔲 Gutenberg Core Block
 - 🔲 Accessibility audit
 - 🔲 Security audit
 - 🔲 Coding standards audit
+- 🔲 Inline Doc audit
 
 ## Contributors
 
