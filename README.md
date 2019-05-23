@@ -1,6 +1,6 @@
-# WordPress Core Pricacy Data Request Form
+# WordPress Core Privacy Data Request Form
 
-Development of a new WordPress Core feature – Privacy Data Request Forms.
+Development of a new WordPress Core feature – Privacy Data Request front-end Forms.
 
 Table of content:
 
@@ -19,6 +19,8 @@ The feature is based on an existing plugin: [GDPR Data Request Form](https://wor
 
 In this repo, you’ll find the folders/files that have been modified from WordPress Core (current trunk).
 
+To test/contribute, just copy these files in your WordPress install.
+
 ## Context
 
 [See WordPress Core Privacy Team roadmap](https://make.wordpress.org/core/roadmap/privacy/):
@@ -32,8 +34,8 @@ In this repo, you’ll find the folders/files that have been modified from WordP
 
 - ✅ PHP Function to display the Privacy Data Request Form: `wp_get_privacy_data_request_form()`
 - ✅ New Core Widget: `WP_Widget_Data_Request`
-- 🔲 Gutenberg Block
 - ✅ Add filters to handle strings customization in the forms
+- 🔲 Gutenberg Block
 - 🔲 Accessibility audit
 - 🔲 Security audit
 - 🔲 Coding standards audit
