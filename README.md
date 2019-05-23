@@ -76,6 +76,7 @@ The defaults set in the `wp_get_privacy_data_request_form()` function are as fol
 		'label_input_email'    => esc_html__( 'Your email address (required)' ),
 		'label_input_captcha'  => esc_html__( 'Human verification (required):' ),
 		'value_submit'         => esc_html__( 'Send Request' ),
+		'request_type'         => 'both',
 	);
 
 #### Example
@@ -91,6 +92,7 @@ function my_privacy_form() {
 		'label_input_email'    => 'Your email',
 		'label_input_captcha'  => 'Please prove you’re a human:',
 		'value_submit'         => 'Send your request',
+		'value_submit'         => 'export',
 	);
 	return $args;
 }
