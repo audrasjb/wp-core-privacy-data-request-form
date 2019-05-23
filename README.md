@@ -59,14 +59,22 @@ In this repo, you’ll find the folders/files that have been modified from WordP
 The defaults set in the `wp_get_privacy_data_request_form()` function are as follows:
 
 	$defaults = array(
-		'form_id'              => 'wp-privacy-form-' . $key_id,
-		'label_select_request' => esc_html__( 'Select your request:' ),
-		'label_select_export'  => esc_html__( 'Export Personal Data' ),
-		'label_select_remove'  => esc_html__( 'Remove Personal Data' ),
-		'label_input_email'    => esc_html__( 'Your email address (required)' ),
-		'label_input_captcha'  => esc_html__( 'Human verification (required):' ),
-		'value_submit'         => esc_html__( 'Send Request' ),
-		'request_type'         => 'both',
+		'form_id'                => 'wp-privacy-form-' . $key_id,
+		'label_select_request'   => esc_html__( 'Select your request:' ),
+		'label_select_export'    => esc_html__( 'Export Personal Data' ),
+		'label_select_remove'    => esc_html__( 'Remove Personal Data' ),
+		'label_input_email'      => esc_html__( 'Your email address (required)' ),
+		'label_input_captcha'    => esc_html__( 'Human verification (required):' ),
+		'value_submit'           => esc_html__( 'Send Request' ),
+		'request_type'           => 'both',
+		'notice_success'         => esc_html__( 'Your enquiry have been submitted. Check your email to validate your data request.' ),
+		'notice_error'           => esc_html__( 'Some errors occurred:' ),
+		'notice_invalid_nonce'   => esc_html__( 'Security check failed, please refresh this page and try to submit the form again.' ),
+		'notice_invalid_email'   => esc_html__( 'Invalid email address.' ),
+		'notice_invalid_captcha' => esc_html__( 'Security check failed: invalid human verification field.' ),
+		'notice_invalid_request' => esc_html__( 'Request type invalid, please refresh this page and try to submit the form again.' ),
+		'notice_missing_field'   => esc_html__( 'All fields are required.' ),
+		'notice_request_failed'  => esc_html__( 'Unable to initiate confirmation request. Please contact the administrator.' ),
 	);
 
 #### Example
@@ -75,14 +83,21 @@ The defaults set in the `wp_get_privacy_data_request_form()` function are as fol
 add_filter( 'privacy_data_request_form_defaults', 'my_privacy_form' );
 function my_privacy_form() {
 	$args = array(
-		'form_id'              => 'my_super_form_id',
-		'label_select_request' => 'Please select a request',
-		'label_select_export'  => 'Export',
-		'label_select_remove'  => 'Delete', 
-		'label_input_email'    => 'Your email',
-		'label_input_captcha'  => 'Please prove you’re a human:',
-		'value_submit'         => 'Send your request',
-		'value_submit'         => 'export',
+		'form_id'                => 'my_privacy_form_id'
+		'label_select_request'   => 'Please select a request',
+		'label_select_export'    => 'Export',
+		'label_select_remove'    => 'Delete', 
+		'label_input_captcha'    => 'Please prove you’re a human:',
+		'value_submit'           => 'Send your request',
+		'request_type'           => 'export',
+		'notice_success'         => 'Thanks for your request… Check your email to validate your data request.',
+		'notice_error'           => 'There is some errors!',
+		'notice_invalid_nonce'   => 'The security nonce failed!',
+		'notice_invalid_email'   => 'Your email is invalid',
+		'notice_invalid_captcha' => 'Invalid mathematic result :-)',
+		'notice_invalid_request' => 'Invalid request: please refresh the page and submit the form again!',
+		'notice_missing_field'   => 'Missing fields',
+		'notice_request_failed'  => 'Privacy Request failed. Please try again!',
 	);
 	return $args;
 }
