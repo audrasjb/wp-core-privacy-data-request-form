@@ -43,6 +43,7 @@ To test/contribute, just copy these files in your WordPress install.
 - 🔲 Accessibility audit
 - 🔲 Security audit
 - 🔲 Coding standards audit
+- 🔲 Graphic Design audit
 - 🔲 Inline Doc audit
 
 ## Contributors 👥
