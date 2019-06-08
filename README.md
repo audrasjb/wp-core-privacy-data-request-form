@@ -40,6 +40,7 @@ To test/contribute, just copy these files in your WordPress install.
 - ✅ Filter Documentation
 - ✅ CSS classes documentation
 - 🔲 Gutenberg Core Block
+- 🔲 Wording audit
 - 🔲 Accessibility audit
 - 🔲 Security audit
 - 🔲 Coding standards audit
