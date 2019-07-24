@@ -40,9 +40,11 @@ To test/contribute, just copy these files in your WordPress install.
 - ✅ Filter Documentation
 - ✅ CSS classes documentation
 - 🔲 Gutenberg Core Block
+- 🔲 Wording audit
 - 🔲 Accessibility audit
 - 🔲 Security audit
 - 🔲 Coding standards audit
+- 🔲 Graphic Design audit
 - 🔲 Inline Doc audit
 
 ## Contributors 👥
@@ -79,7 +81,7 @@ The defaults set in the `wp_get_privacy_data_request_form()` function are as fol
 		'label_input_email'      => esc_html__( 'Your email address (required)' ),
 		'label_input_captcha'    => esc_html__( 'Human verification (required):' ),
 		'value_submit'           => esc_html__( 'Send Request' ),
-		'request_type'           => 'both',
+		'request_type'           => 'both', // Accepts 'both', 'export' or 'delete'
 		'notice_success'         => esc_html__( 'Your enquiry have been submitted. Check your email to validate your data request.' ),
 		'notice_error'           => esc_html__( 'Some errors occurred:' ),
 		'notice_invalid_nonce'   => esc_html__( 'Security check failed, please refresh this page and try to submit the form again.' ),
