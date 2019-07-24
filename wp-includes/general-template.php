@@ -386,7 +386,7 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 	// Actions if the form was previously submitted
 	if ( isset( $_POST['wp_privacy_form_email'] ) ) {
 		$wp_privacy_form_errors    = array();
-		$pricacy_form_notice       = '';
+		$privacy_form_notice       = '';
 		$wp_privacy_form_type      = sanitize_key( $_POST['wp_privacy_form_type'] );
 		$wp_privacy_form_email     = sanitize_email( $_POST['wp_privacy_form_email'] );
 		$wp_privacy_form_human     = absint( filter_input( INPUT_POST, 'wp_privacy_form_human', FILTER_SANITIZE_NUMBER_INT ) );
@@ -419,10 +419,10 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 			} elseif ( ! $request_id ) {
 				$wp_privacy_form_errors[] = $args['notice_request_failed'];
 			} else {
-				$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . $args['notice_success'] . '</div>';
+				$privacy_form_notice = '<div class="wp-privacy-form-notice wp-privacy-form-notice-error">' . $args['notice_success'] . '</div>';
 			}
 		} else {
-			$pricacy_form_notice = '<div class="wp-pricacy-form-notice wp-pricacy-form-notice-error">' . $args['notice_error'] . '<br />' . join( '<br />', $wp_privacy_form_errors ) . '</div>';
+			$privacy_form_notice = '<div class="wp-privacy-form-notice wp-privacy-form-notice-error">' . $args['notice_error'] . '<br />' . join( '<br />', $wp_privacy_form_errors ) . '</div>';
 		}
 	}
 
@@ -438,7 +438,7 @@ function wp_get_privacy_data_request_form( $args = array() ) {
 		<input type="hidden" name="wp_privacy_form_human_key" value="<?php echo $number_one . '000' . $number_two; ?>" />
 		<input type="hidden" name="wp_privacy_form_nonce" value="<?php echo wp_create_nonce( 'wp_privacy_form_nonce' ); ?>" />
 		
-		<?php if ( ! empty( $pricacy_form_notice ) ) { echo $pricacy_form_notice; } ?>
+		<?php if ( ! empty( $privacy_form_notice ) ) { echo $privacy_form_notice; } ?>
 		
 		<?php if ( 'export' === $args['request_type'] ) : ?>
 			<input type="hidden" name="wp_privacy_form_type" value="export_personal_data">

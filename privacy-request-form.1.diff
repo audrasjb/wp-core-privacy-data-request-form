@@ -1,0 +1,356 @@
+diff --git a/src/wp-includes/default-widgets.php b/src/wp-includes/default-widgets.php
+index 767002b..4905126 100644
+--- a/src/wp-includes/default-widgets.php
++++ b/src/wp-includes/default-widgets.php
+@@ -63,3 +63,6 @@ require_once( ABSPATH . WPINC . '/widgets/class-wp-nav-menu-widget.php' );
+ 
+ /** WP_Widget_Custom_HTML class */
+ require_once( ABSPATH . WPINC . '/widgets/class-wp-widget-custom-html.php' );
++
++/** WP_Widget_Data_Request class */
++require_once( ABSPATH . WPINC . '/widgets/class-wp-widget-data-request-form.php' );
+diff --git a/src/wp-includes/general-template.php b/src/wp-includes/general-template.php
+index f9b7bf3..30f7a47 100644
+--- a/src/wp-includes/general-template.php
++++ b/src/wp-includes/general-template.php
+@@ -308,6 +308,185 @@ function get_search_form( $args = array() ) {
+ }
+ 
+ /**
++ * Display Privacy Data Request Form.
++ *
++ * @since 5.3.0
++ *
++ * @param array $args {
++ *     Optional. Array of options to control the form output. Default empty array.
++ *
++ *     @type string $form_id                ID attribute value for the form. Default 'loginform'.
++ *     @type string $label_select_request   Label for request selection field. Default 'Select your request:'.
++ *     @type string $label_select_export    Label for export radiobutton field. Default 'Export Personal Data'.
++ *     @type string $label_select_remove    Label for remove radiobutton field. Default 'Remove Personal Data'.
++ *     @type string $label_input_email      Label for email input field. Default 'Your email address (required)'.
++ *     @type string $label_input_captcha    Label for math captcha input field. Default 'Human verification (required):'.
++ *     @type string $value_submit           Text for submit button. Default 'Send Request'.
++ *     @type string $request_type           Select Request type.
++ *                                          Accepted values:
++ *                                          'both' (both export and remove Request)
++ *                                          'export' (export Request only)
++ *                                          'remove' (remove Request only)
++ *                                          Default 'both'.
++ *     @type string $notice_success         Text for success notice. 
++ *                                          Default 'Your enquiry have been submitted. Check your email to validate your data request.'.
++ *     @type string $notice_error           Text for error notice.
++ *                                          Default 'Some errors occurred:'.
++ *     @type string $notice_invalid_nonce   Text for invalid nonce.
++ *                                          Default 'Security check failed, please refresh this page and try to submit the form again.'.
++ *     @type string $notice_invalid_email   Text for invalid email.
++ *                                          Default 'Invalid email address.'.
++ *     @type string $notice_invalid_captcha Text for invalid captcha.
++ *                                          Default 'Security check failed: invalid human verification field.'.
++ *     @type string $notice_invalid_request Text for invalid request.
++ *                                          Default 'Request type invalid, please refresh this page and try to submit the form again.'.
++ *     @type string $notice_missing_field   Text for missing field.
++ *                                          Default 'All fields are required.'.
++ *     @type string $notice_request_failed  Text for failed request.
++ *                                          Default 'Unable to initiate confirmation request. Please contact the administrator.'.
++ * }
++ * @return string String when retrieving.
++ */
++function wp_get_privacy_data_request_form( $args = array() ) {
++
++	// Key to avoid duplicate IDs
++	$key_id = uniqid();
++
++	$defaults = array(
++		'form_id'                => 'wp-privacy-form-' . $key_id,
++		'label_select_request'   => esc_html__( 'Select your request:' ),
++		'label_select_export'    => esc_html__( 'Export Personal Data' ),
++		'label_select_remove'    => esc_html__( 'Remove Personal Data' ),
++		'label_input_email'      => esc_html__( 'Your email address (required)' ),
++		'label_input_captcha'    => esc_html__( 'Human verification (required):' ),
++		'value_submit'           => esc_html__( 'Send Request' ),
++		'request_type'           => 'both',
++		'notice_success'         => esc_html__( 'Your enquiry have been submitted. Check your email to validate your data request.' ),
++		'notice_error'           => esc_html__( 'Some errors occurred:' ),
++		'notice_invalid_nonce'   => esc_html__( 'Security check failed, please refresh this page and try to submit the form again.' ),
++		'notice_invalid_email'   => esc_html__( 'Invalid email address.' ),
++		'notice_invalid_captcha' => esc_html__( 'Security check failed: invalid human verification field.' ),
++		'notice_invalid_request' => esc_html__( 'Request type invalid, please refresh this page and try to submit the form again.' ),
++		'notice_missing_field'   => esc_html__( 'All fields are required.' ),
++		'notice_request_failed'  => esc_html__( 'Unable to initiate confirmation request. Please contact the administrator.' ),
++	);
++
++	/**
++	 * Filters the default Privacy Data Request Form output arguments.
++	 *
++	 * @since 5.3.0
++	 *
++	 * @see wp_get_privacy_data_request_form()
++	 *
++	 * @param array $defaults An array of default Privacy Data Request Form arguments.
++	 */
++
++	$args = wp_parse_args( $args, array_merge( $defaults, apply_filters( 'privacy_data_request_form_defaults', $defaults ) ) );
++
++	// Actions if the form was previously submitted
++	if ( isset( $_POST['wp_privacy_form_email'] ) ) {
++		$wp_privacy_form_errors    = array();
++		$privacy_form_notice       = '';
++		$wp_privacy_form_type      = sanitize_key( $_POST['wp_privacy_form_type'] );
++		$wp_privacy_form_email     = sanitize_email( $_POST['wp_privacy_form_email'] );
++		$wp_privacy_form_human     = absint( filter_input( INPUT_POST, 'wp_privacy_form_human', FILTER_SANITIZE_NUMBER_INT ) );
++		$wp_privacy_form_human_key = esc_html( filter_input( INPUT_POST, 'wp_privacy_form_human_key', FILTER_SANITIZE_STRING ) );
++		$wp_privacy_form_numbers   = explode( '000', $wp_privacy_form_human_key );
++		$wp_privacy_form_answer    = absint( $wp_privacy_form_numbers[0] ) + absint( $wp_privacy_form_numbers[1] );
++		$wp_privacy_form_nonce     = esc_html( filter_input( INPUT_POST, 'wp_privacy_form_nonce', FILTER_SANITIZE_STRING ) );
++	
++		if ( ! empty( $wp_privacy_form_email ) && ! empty( $wp_privacy_form_human ) ) {
++			if ( ! wp_verify_nonce( $wp_privacy_form_nonce, 'wp_privacy_form_nonce' ) ) {
++				$wp_privacy_form_errors[] = $args['notice_invalid_nonce'];
++			} else {
++				if ( ! is_email( $wp_privacy_form_email ) ) {
++					$wp_privacy_form_errors[] = $args['notice_invalid_email'];
++				}
++				if ( intval( $wp_privacy_form_answer ) !== intval( $wp_privacy_form_human ) ) {
++					$wp_privacy_form_errors[] = $args['notice_invalid_captcha'];
++				}
++				if ( ! in_array( $wp_privacy_form_type, array( 'export_personal_data', 'remove_personal_data' ), true ) ) {
++					$wp_privacy_form_errors[] = $args['notice_invalid_request'];
++				}
++			}
++		} else {
++			$wp_privacy_form_errors[] = $args['notice_missing_field'];
++		}
++		if ( empty( $wp_privacy_form_errors ) ) {
++			$request_id = wp_create_user_request( $wp_privacy_form_email, $wp_privacy_form_type );
++			if ( is_wp_error( $request_id ) ) {
++				$wp_privacy_form_errors[] = $request_id->get_error_message();
++			} elseif ( ! $request_id ) {
++				$wp_privacy_form_errors[] = $args['notice_request_failed'];
++			} else {
++				$privacy_form_notice = '<div class="wp-privacy-form-notice wp-privacy-form-notice-error">' . $args['notice_success'] . '</div>';
++			}
++		} else {
++			$privacy_form_notice = '<div class="wp-privacy-form-notice wp-privacy-form-notice-error">' . $args['notice_error'] . '<br />' . join( '<br />', $wp_privacy_form_errors ) . '</div>';
++		}
++	}
++
++	// Math captcha
++	$number_one = rand( 1, 9 );
++	$number_two = rand( 1, 9 );
++
++	// Return the form
++	ob_start();
++	?>
++	<form action="<?php esc_url( '#' . $args['form_id'] ); ?>" id="<?php echo $args['form_id']; ?>" class="wp-privacy-form" method="post">
++		<input type="hidden" name="action" value="wp_privacy_form-data_request">
++		<input type="hidden" name="wp_privacy_form_human_key" value="<?php echo $number_one . '000' . $number_two; ?>" />
++		<input type="hidden" name="wp_privacy_form_nonce" value="<?php echo wp_create_nonce( 'wp_privacy_form_nonce' ); ?>" />
++		
++		<?php if ( ! empty( $privacy_form_notice ) ) { echo $privacy_form_notice; } ?>
++		
++		<?php if ( 'export' === $args['request_type'] ) : ?>
++			<input type="hidden" name="wp_privacy_form_type" value="export_personal_data">
++		<?php elseif ( 'remove' === $args['request_type'] ) : ?>
++			<input type="hidden" name="wp_privacy_form_type" value="remove_personal_data">
++		<?php else : ?>
++			<div class="wp-privacy-form-field wp-privacy-form-field-action" role="radiogroup" aria-labelledby="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
++				<p id="wp-privacy-form-radio-label-<?php echo $key_id; ?>">
++					<?php echo $args['label_select_request']; ?>
++				</p>
++				<input id="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="export_personal_data">
++				<label for="wp-privacy-form-data-type-export-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
++					<?php echo $args['label_select_export']; ?>
++				</label>
++				<br />
++				<input id="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-input" type="radio" name="wp_privacy_form_type" value="remove_personal_data">
++				<label for="wp-privacy-form-data-type-remove-<?php echo $key_id; ?>" class="wp-privacy-form-data-type-label">
++					<?php echo $args['label_select_remove']; ?>
++				</label>
++			</div>
++		<?php endif; ?>
++
++		<p class="wp-privacy-form-field wp-privacy-form-field-email">
++			<label for="wp_privacy_form-data_email-<?php echo $key_id; ?>">
++				<?php echo $args['label_input_email']; ?>
++			</label>
++			<br />
++			<input type="email" id="wp_privacy_form-data_email-<?php echo $key_id; ?>" name="wp_privacy_form_email" required />
++		</p>
++
++		<p class="wp-privacy-form-field wp-privacy-form-field-human">
++			<label for="wp_privacy_form-data_human-<?php echo $key_id; ?>">
++				<?php echo $args['label_input_captcha']; ?>
++				<?php echo $number_one . ' + ' . $number_two . ' = ?'; ?>
++			</label>
++			<br />
++			<input type="text" id="wp_privacy_form-data_human-<?php echo $key_id; ?>" name="wp_privacy_form_human" required />
++		</p>
++
++		<p class="wp-privacy-form-field wp-privacy-form-field-submit">
++			<input type="submit" value="<?php echo $args['value_submit']; ?>" />
++		</p>
++	</form>
++	<?php
++	return ob_get_clean();
++}
++
++/**
+  * Display the Log In/Out link.
+  *
+  * Displays a link, which allows users to navigate to the Log In page to log in
+diff --git a/src/wp-includes/widgets.php b/src/wp-includes/widgets.php
+index cc1a990..614caf2 100644
+--- a/src/wp-includes/widgets.php
++++ b/src/wp-includes/widgets.php
+@@ -1711,6 +1711,8 @@ function wp_widgets_init() {
+ 
+ 	register_widget( 'WP_Widget_Custom_HTML' );
+ 
++	register_widget( 'WP_Widget_Data_Request' );
++
+ 	/**
+ 	 * Fires after all default WordPress widgets have been registered.
+ 	 *
+diff --git a/src/wp-includes/widgets/class-wp-widget-data-request-form.php b/src/wp-includes/widgets/class-wp-widget-data-request-form.php
+new file mode 100644
+index 0000000..d8e6a9f
+--- /dev/null
++++ b/src/wp-includes/widgets/class-wp-widget-data-request-form.php
+@@ -0,0 +1,136 @@
++<?php
++/**
++ * Widget API: WP_Widget_Data_Request class
++ *
++ * @package WordPress
++ * @subpackage Widgets
++ * @since 5.3.0
++ */
++
++/**
++ * Core class used to implement a Privacy Data Request Form.
++ *
++ * @since 5.3.0
++ *
++ * @see WP_Widget
++ */
++class WP_Widget_Data_Request extends WP_Widget {
++
++	/**
++	 * Sets up a new Data Request Form widget instance.
++	 *
++	 * @since 5.3.0
++	 */
++	public function __construct() {
++		$widget_ops = array(
++			'classname'                   => 'widget_data_request_form',
++			'description'                 => __( 'A Privacy Data Request Form for your site.' ),
++			'customize_selective_refresh' => true,
++		);
++		parent::__construct( 'data-request', _x( 'Data Request Form', 'Data Request Form widget' ), $widget_ops );
++	}
++
++	/**
++	 * Outputs the content for the current Data Request widget instance.
++	 *
++	 * @since 5.3.0
++	 *
++	 * @param array $args     Display arguments including 'before_title', 'after_title',
++	 *                        'before_widget', and 'after_widget'.
++	 * @param array $instance Settings for the current Data Request widget instance.
++	 */
++	public function widget( $args, $instance ) {
++		$title        = ! empty( $instance['title'] ) ? $instance['title'] : '';
++		$description  = ! empty( $instance['description'] ) ? $instance['description'] : '';
++		$request_type = ! empty( $instance['request_type'] ) ? $instance['request_type'] : 'both';
++
++		/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
++		$title = apply_filters( 'widget_title', $title, $instance, $this->id_base );
++
++		echo $args['before_widget'];
++		if ( $title ) {
++			echo $args['before_title'] . $title . $args['after_title'];
++		}
++		?>
++		
++		<?php if ( ! empty( $description ) ) : ?>
++			<div class="data-request-form-field-description">
++				<?php echo apply_filters( 'the_content', $description ); ?>
++			</div>
++		<?php endif; ?>
++
++		<?php
++		echo wp_get_privacy_data_request_form( array( 'request_type' => $request_type ) );
++
++		echo $args['after_widget'];
++	}
++
++	/**
++	 * Outputs the settings form for the Data Request widget.
++	 *
++	 * @since 5.3.0
++	 *
++	 * @param array $instance Current settings.
++	 */
++	public function form( $instance ) {
++		$instance     = wp_parse_args( (array) $instance, array( 'title' => '', 'description' => '', 'request_type' => 'both' ) );
++		$title        = $instance['title'];
++		$description  = $instance['description'];
++		$request_type = $instance['request_type'];
++		?>
++		<p>
++			<label for="<?php echo $this->get_field_id( 'title' ); ?>">
++				<?php _e( 'Title:' ); ?> 
++				<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
++			</label>
++		</p>
++		<p>
++			<label for="<?php echo $this->get_field_id( 'description' ); ?>">
++				<?php _e( 'Description:' ); ?> 
++				<textarea class="widefat" id="<?php echo $this->get_field_id( 'description' ); ?>" name="<?php echo $this->get_field_name( 'description' ); ?>"><?php echo sanitize_textarea_field( $description ); ?></textarea>
++			</label>
++		</p>
++		<div role="radiogroup" aria-labelledby="wp-privacy-form-radio-label">
++			<p id="wp-privacy-form-radio-label"><?php esc_html_e( 'Request type available in the form:' ); ?></p>
++			<p>
++				<label for="<?php echo $this->get_field_id( 'request_type' ); ?>-both">
++					<input type="radio" name="<?php echo $this->get_field_name( 'request_type' ); ?>" id="<?php echo $this->get_field_id( 'request_type' ); ?>-both" value="both"<?php checked( $request_type, 'both' ); ?> />
++					<?php esc_html_e( 'Both Export and Remove' ); ?>
++				</label>
++			</p>
++			<p>
++				<label for="<?php echo $this->get_field_id( 'request_type' ); ?>-export">
++					<input type="radio" name="<?php echo $this->get_field_name( 'request_type' ); ?>" id="<?php echo $this->get_field_id( 'request_type' ); ?>-export" value="export"<?php checked( $request_type, 'export' ); ?> />
++					<?php esc_html_e( 'Export' ); ?>
++				</label>
++			</p>
++			<p>
++				<label for="<?php echo $this->get_field_id( 'request_type' ); ?>-remove">
++					<input type="radio" name="<?php echo $this->get_field_name( 'request_type' ); ?>" id="<?php echo $this->get_field_id( 'request_type' ); ?>-remove" value="remove" <?php checked( $request_type, 'remove' ); ?> />
++					<?php esc_html_e( 'Remove' ); ?>
++				</label>
++			</p>
++		</div>
++		<?php
++	}
++
++	/**
++	 * Handles updating settings for the current Search widget instance.
++	 *
++	 * @since 5.3.0
++	 *
++	 * @param array $new_instance New settings for this instance as input by the user via
++	 *                            WP_Widget::form().
++	 * @param array $old_instance Old settings for this instance.
++	 * @return array Updated settings.
++	 */
++	public function update( $new_instance, $old_instance ) {
++		$instance                 = wp_parse_args( (array) $instance, array( 'title' => '', 'description' => '' ) );
++		$instance                 = $old_instance;
++		$instance['title']        = sanitize_text_field( $new_instance['title'] );
++		$instance['description']  = sanitize_textarea_field( $new_instance['description'] );
++		$instance['request_type'] = sanitize_text_field( $new_instance['request_type'] );
++		return $instance;
++	}
++
++}
